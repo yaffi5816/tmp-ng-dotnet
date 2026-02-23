@@ -1,0 +1,59 @@
+<div class="cart-container">
+  <div class="cart-header">
+    <h1>Your Shopping Cart</h1>
+    <p *ngIf="cartItems.length > 0">You have {{ cartService.getItemCount() }} items in your cart</p>
+  </div>
+
+  <div *ngIf="cartItems.length === 0" class="empty-cart">
+    <svg width="80" height="80" viewBox="0 0 20 20" fill="none">
+      <path d="M3 3h2l.4 2M7 13h10l2-7H5.4M7 13L5.4 5M7 13l-1.5 2M17 13l1.5 2M9 17a1 1 0 11-2 0 1 1 0 012 0zM17 17a1 1 0 11-2 0 1 1 0 012 0z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <h2>Your cart is empty</h2>
+    <p>You haven't added any products yet</p>
+    <button class="btn-continue" (click)="continueShopping()">Continue Shopping</button>
+  </div>
+
+  <div *ngIf="cartItems.length > 0" class="cart-content">
+    <div class="cart-items">
+      <div *ngFor="let item of cartItems" class="cart-item">
+        <img [src]="getImageUrl(item.product.imgUrl)" [alt]="item.product.productName">
+        <div class="item-details">
+          <h3>{{ item.product.productName }}</h3>
+          <p class="item-category">{{ item.product.categoryName }}</p>
+          <p class="item-price">${{ item.product.price }}</p>
+        </div>
+        <div class="item-actions">
+          <div class="quantity-control">
+            <button (click)="updateQuantity(item.productId, item.quantity - 1)">-</button>
+            <span>{{ item.quantity }}</span>
+            <button (click)="updateQuantity(item.productId, item.quantity + 1)">+</button>
+          </div>
+          <div class="item-total">${{ item.product.price * item.quantity }}</div>
+          <button class="btn-remove" (click)="removeItem(item.productId)">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M6 6l8 8M14 6l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="cart-summary">
+      <h2>Order Summary</h2>
+      <div class="summary-row">
+        <span>Subtotal:</span>
+        <span>${{ cartService.getTotal() }}</span>
+      </div>
+      <div class="summary-row">
+        <span>Shipping:</span>
+        <span>Free</span>
+      </div>
+      <div class="summary-total">
+        <span>Total:</span>
+        <span>${{ cartService.getTotal() }}</span>
+      </div>
+      <button class="btn-checkout" (click)="checkout()">Proceed to Checkout</button>
+      <button class="btn-continue-shopping" (click)="continueShopping()">Continue Shopping</button>
+    </div>
+  </div>
+</div>

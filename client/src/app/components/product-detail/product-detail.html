@@ -1,0 +1,51 @@
+<div class="product-detail-container">
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Loading product...</p>
+  </div>
+
+  <div *ngIf="!loading && product" class="product-detail">
+    <button class="btn-back" (click)="goBack()">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M12 4L6 10L12 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Back to Products
+    </button>
+
+    <div class="product-content">
+      <div class="product-image-large">
+        <img [src]="product.imgUrl || 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=800'" [alt]="product.productName">
+      </div>
+
+      <div class="product-info">
+        <span class="product-category">{{ product.categoryName }}</span>
+        <h1>{{ product.productName }}</h1>
+        <p class="product-description">{{ product.productDescreption }}</p>
+        
+        <div class="product-price-large">
+          <span class="price">${{ product.price }}</span>
+          <span class="price-label">one-time payment</span>
+        </div>
+
+        <div class="purchase-section">
+          <div class="quantity-selector-large">
+            <button (click)="decrementQuantity()">-</button>
+            <span>{{ quantity }}</span>
+            <button (click)="incrementQuantity()">+</button>
+          </div>
+          <button class="btn-add-to-cart-large" (click)="addToCart()">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M3 3h2l.4 2M7 13h10l2-7H5.4M7 13L5.4 5M7 13l-1.5 2M17 13l1.5 2M9 17a1 1 0 11-2 0 1 1 0 012 0zM17 17a1 1 0 11-2 0 1 1 0 012 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Add to Cart
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && !product" class="error-state">
+    <h2>Product not found</h2>
+    <button class="btn-back" (click)="goBack()">Back to Products</button>
+  </div>
+</div>

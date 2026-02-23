@@ -1,0 +1,126 @@
+<header class="header">
+  <div class="header-container">
+    <div class="logo-section">
+      <svg class="logo-icon" width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <defs>
+          <radialGradient id="logoGradient" cx="50%" cy="50%" r="70%">
+            <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#1e40af;stop-opacity:1" />
+          </radialGradient>
+        </defs>
+        <rect width="40" height="40" rx="10" fill="url(#logoGradient)"/>
+        <path d="M20 8L22.5 16L30 18.5L22.5 21L20 29L17.5 21L10 18.5L17.5 16L20 8Z" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M28 11L29 13L31 14L29 15L28 17L27 15L25 14L27 13L28 11Z" fill="white"/>
+        <path d="M12 23L13 25L15 26L13 27L12 29L11 27L9 26L11 25L12 23Z" fill="white"/>
+      </svg>
+      <span class="logo-text">DashBoard</span>
+      <span *ngIf="isLoggedIn" class="welcome-text clickable" (click)="openUserProfile()">Welcome, {{ username }}</span>
+    </div>
+    
+    <nav class="nav-buttons">
+      <button class="nav-btn" (click)="goToHome()">
+        <svg width="24" height="24" viewBox="0 0 40 40" fill="none">
+          <path d="M20 8L22.5 16L30 18.5L22.5 21L20 29L17.5 21L10 18.5L17.5 16L20 8Z" stroke="#87CEEB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M28 11L29 13L31 14L29 15L28 17L27 15L25 14L27 13L28 11Z" fill="#87CEEB"/>
+          <path d="M12 23L13 25L15 26L13 27L12 29L11 27L9 26L11 25L12 23Z" fill="#87CEEB"/>
+        </svg>
+        <span style="color: #87CEEB;">Home</span>
+      </button>
+      <button class="nav-btn" (click)="navigateToProducts()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M4 4h12v12H4V4z M8 8h4v4H8V8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Products
+      </button>
+      <button class="nav-btn" (click)="navigateToOrders()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M9 2L3 6V9C3 13.55 6.84 17.74 9 18C11.16 17.74 15 13.55 15 9V6L9 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M7 9L9 11L13 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Orders
+      </button>
+      <button *ngIf="isAdmin" class="nav-btn" (click)="navigateToUsers()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M13 14C13 12.3431 11.6569 11 10 11C8.34315 11 7 12.3431 7 14M10 8C10 9.10457 9.10457 10 8 10C6.89543 10 6 9.10457 6 8C6 6.89543 6.89543 6 8 6C9.10457 6 10 6.89543 10 8ZM14 6C14 7.10457 13.1046 8 12 8C10.8954 8 10 7.10457 10 6C10 4.89543 10.8954 4 12 4C13.1046 4 14 4.89543 14 6Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Users
+      </button>
+      
+      <button *ngIf="!isLoggedIn" class="nav-btn-primary" (click)="login()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M10 11C12.2091 11 14 9.20914 14 7C14 4.79086 12.2091 3 10 3C7.79086 3 6 4.79086 6 7C6 9.20914 7.79086 11 10 11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M3 17C3 14.2386 5.68629 12 9 12H11C14.3137 12 17 14.2386 17 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Login
+      </button>
+      <button *ngIf="isLoggedIn" class="nav-btn-primary" (click)="logout()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M13 3H16C16.5304 3 17.0391 3.21071 17.4142 3.58579C17.7893 3.96086 18 4.46957 18 5V15C18 15.5304 17.7893 16.0391 17.4142 16.4142C17.0391 16.7893 16.5304 17 16 17H13M8 13L12 9M12 9L8 5M12 9H2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Logout
+      </button>
+      
+      <div class="cart-container" (mouseenter)="showCartPreview = true" (mouseleave)="showCartPreview = false">
+        <button class="nav-btn cart-btn" (click)="goToCart()">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M3 3h2l.4 2M7 13h10l2-7H5.4M7 13L5.4 5M7 13l-1.5 2M17 13l1.5 2M9 17a1 1 0 11-2 0 1 1 0 012 0zM17 17a1 1 0 11-2 0 1 1 0 012 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Cart</span>
+          <span *ngIf="cartService.getItemCount() > 0" class="cart-badge">{{ cartService.getItemCount() }}</span>
+        </button>
+        
+        <div *ngIf="showCartPreview && cartItems.length > 0" class="cart-preview">
+          <div class="cart-preview-items">
+            <div *ngFor="let item of cartItems" class="cart-preview-item">
+              <img [src]="item.product.imgUrl || 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=100'" [alt]="item.product.productName">
+              <div class="cart-preview-info">
+                <span class="cart-preview-name">{{ item.product.productName }}</span>
+                <span class="cart-preview-price">{{ item.quantity }} x ${{ item.product.price }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="cart-preview-total">
+            <span>Total:</span>
+            <span>${{ cartService.getTotal() }}</span>
+          </div>
+          <button class="cart-preview-btn" (click)="goToCart()">Go to Cart</button>
+        </div>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<div *ngIf="showUserModal" class="modal-overlay" (click)="closeUserModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Update Profile</h2>
+      <button class="modal-close" (click)="closeUserModal()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M6 6L18 18M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" [(ngModel)]="userForm.userName" class="form-input">
+      </div>
+      
+      <div class="form-group">
+        <label>First Name</label>
+        <input type="text" [(ngModel)]="userForm.firstName" class="form-input">
+      </div>
+      
+      <div class="form-group">
+        <label>Last Name</label>
+        <input type="text" [(ngModel)]="userForm.lastName" class="form-input">
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeUserModal()">Cancel</button>
+      <button class="btn-save" (click)="saveUserProfile()">Update</button>
+    </div>
+  </div>
+</div>

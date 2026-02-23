@@ -1,0 +1,80 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <svg width="60" height="60" viewBox="0 0 40 40" fill="none">
+        <defs>
+          <radialGradient id="loginGradient" cx="50%" cy="50%" r="70%">
+            <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#1e40af;stop-opacity:1" />
+          </radialGradient>
+        </defs>
+        <rect width="40" height="40" rx="10" fill="url(#loginGradient)"/>
+        <path d="M20 8L22.5 16L30 18.5L22.5 21L20 29L17.5 21L10 18.5L17.5 16L20 8Z" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M28 11L29 13L31 14L29 15L28 17L27 15L25 14L27 13L28 11Z" fill="white"/>
+        <path d="M12 23L13 25L15 26L13 27L12 29L11 27L9 26L11 25L12 23Z" fill="white"/>
+      </svg>
+      <h1>{{ isRegisterMode ? 'Create Account' : 'Welcome Back' }}</h1>
+      <p>{{ isRegisterMode ? 'Register to continue to DashBoard' : 'Sign in to continue to DashBoard' }}</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input 
+          type="text" 
+          id="username" 
+          [(ngModel)]="username" 
+          name="username"
+          placeholder="Enter your username"
+          required>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          [(ngModel)]="password" 
+          name="password"
+          placeholder="Enter your password"
+          required>
+      </div>
+
+      <div *ngIf="isRegisterMode" class="form-group">
+        <label for="firstName">First Name</label>
+        <input 
+          type="text" 
+          id="firstName" 
+          [(ngModel)]="firstName" 
+          name="firstName"
+          placeholder="Enter your first name"
+          required>
+      </div>
+
+      <div *ngIf="isRegisterMode" class="form-group">
+        <label for="lastName">Last Name</label>
+        <input 
+          type="text" 
+          id="lastName" 
+          [(ngModel)]="lastName" 
+          name="lastName"
+          placeholder="Enter your last name"
+          required>
+      </div>
+
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+
+      <button type="submit" class="btn-login">
+        {{ isRegisterMode ? 'Register' : 'Sign In' }}
+      </button>
+
+      <div class="switch-mode">
+        <span *ngIf="!isRegisterMode">Don't have an account? </span>
+        <span *ngIf="isRegisterMode">Already have an account? </span>
+        <a (click)="switchMode()">{{ isRegisterMode ? 'Sign In' : 'Register' }}</a>
+      </div>
+    </form>
+  </div>
+</div>

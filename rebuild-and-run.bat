@@ -1,0 +1,9 @@
+@echo off
+cd /d c:\Users\y0533\Desktop\DashGen\WebApi\WebApiShop\WebApiShop
+echo Cleaning previous build...
+dotnet clean
+echo Building project...
+dotnet build
+echo Starting server...
+dotnet run
+pause

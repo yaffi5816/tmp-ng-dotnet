@@ -1,0 +1,184 @@
+<div class="products-container">
+  <div class="products-header">
+    <h1>Choose Your Template</h1>
+    <p>Select a professionally designed dashboard layout to get started</p>
+    <button *ngIf="isAdmin" class="btn-add-product" (click)="addNewProduct()">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Add Product
+    </button>
+  </div>
+
+  <div class="filters-section">
+    <div class="search-box">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM19 19l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <input type="text" [(ngModel)]="searchQuery" placeholder="Search products...">
+    </div>
+
+    <div class="category-filters">
+      <button 
+        [class.active]="selectedCategory === 'All'"
+        (click)="filterByCategory('All')"
+        class="filter-btn">
+        All
+      </button>
+      <button 
+        *ngFor="let category of categories" 
+        [class.active]="selectedCategory === category.categoryName"
+        (click)="filterByCategory(category.categoryName || 'All')"
+        class="filter-btn">
+        {{ category.categoryName }}
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Loading products...</p>
+  </div>
+
+  <div *ngIf="!loading" class="products-grid">
+    <div *ngFor="let product of filteredProducts" class="product-card" (click)="selectProduct(product)">
+      <div class="product-image">
+        <img [src]="getImageUrl(product.imgUrl)" [alt]="product.productName">
+      </div>
+      <div class="product-content">
+        <div class="product-header">
+          <h3>{{ product.productName }}</h3>
+          <div class="product-price">
+            <span class="price">${{ product.price }}</span>
+            <span class="price-label">one-time</span>
+          </div>
+        </div>
+        <span class="product-category">{{ product.categoryName }}</span>
+        <p class="product-description">{{ product.productDescreption }}</p>
+        <div class="product-actions" (click)="$event.stopPropagation()">
+          <div class="quantity-selector">
+            <button class="qty-btn" (click)="decrementQuantity(product.productId)">-</button>
+            <input type="number" [ngModel]="getQuantity(product.productId)" (ngModelChange)="setQuantity(product.productId, $event)" min="1" class="qty-input">
+            <button class="qty-btn" (click)="incrementQuantity(product.productId)">+</button>
+          </div>
+          <button class="btn-add-cart" (click)="addToCart(product, getQuantity(product.productId))">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+              <path d="M3 3h2l.4 2M7 13h10l2-7H5.4M7 13L5.4 5M7 13l-1.5 2M17 13l1.5 2M9 17a1 1 0 11-2 0 1 1 0 012 0zM17 17a1 1 0 11-2 0 1 1 0 012 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Add to Cart
+          </button>
+        </div>
+        <div *ngIf="isAdmin" class="admin-actions" (click)="$event.stopPropagation()">
+          <button class="btn-edit" (click)="editProduct(product)">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Edit
+          </button>
+          <button class="btn-delete" (click)="deleteProduct(product.productId)">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+              <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && filteredProducts.length === 0" class="empty-state">
+    <h2>No products found</h2>
+    <p>Try adjusting your search or filters</p>
+  </div>
+
+  <div *ngIf="!loading && filteredProducts.length > 0" class="pagination">
+    <button class="pagination-btn" (click)="previousPage()" [disabled]="currentPage === 1">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Previous
+    </button>
+    
+    <div class="pagination-numbers">
+      <button *ngFor="let page of pages" 
+              class="pagination-number" 
+              [class.active]="page === currentPage"
+              (click)="goToPage(page)">
+        {{ page }}
+      </button>
+    </div>
+    
+    <button class="pagination-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
+      Next
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M6 4L10 8L6 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<div *ngIf="showModal" class="modal-overlay" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ editingProduct ? 'Edit Product' : 'Add New Product' }}</h2>
+      <button class="modal-close" (click)="closeModal()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M6 6L18 18M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Product Name</label>
+        <input type="text" [(ngModel)]="productForm.productName" class="form-input">
+      </div>
+      
+      <div class="form-group">
+        <label>Category</label>
+        <select [(ngModel)]="productForm.categoryId" class="form-input">
+          <option *ngFor="let category of categoriesForForm" [value]="category.categoryId">{{ category.categoryName }}</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label>Description</label>
+        <textarea [(ngModel)]="productForm.productDescreption" class="form-input" rows="3"></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label>Price</label>
+        <input type="number" [(ngModel)]="productForm.price" class="form-input">
+      </div>
+      
+      <div class="form-group">
+        <label>Image</label>
+        <div class="image-upload-container">
+          <div *ngIf="productForm.imgUrl" class="image-preview">
+            <img [src]="getImageUrl(productForm.imgUrl)" alt="Product image">
+            <button type="button" class="btn-remove-image" (click)="removeImage()">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+          <div *ngIf="!productForm.imgUrl" class="image-dropzone" 
+               (dragover)="onDragOver($event)" 
+               (drop)="onDrop($event)"
+               (click)="fileInput.click()">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+              <path d="M12 4V20M4 12H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <p>Drag & drop image or click to browse</p>
+            <input #fileInput type="file" accept="image/*" (change)="onFileSelected($event)" style="display: none">
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeModal()">Cancel</button>
+      <button class="btn-save" (click)="saveProduct()">{{ editingProduct ? 'Update' : 'Create' }}</button>
+    </div>
+  </div>
+</div>

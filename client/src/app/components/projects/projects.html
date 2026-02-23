@@ -1,0 +1,120 @@
+<div class="orders-container">
+  <div class="orders-header">
+    <div class="header-content">
+      <h1>My Orders</h1>
+      <p>Manage your dashboard orders</p>
+    </div>
+    <button class="btn-new-order" (click)="createNewOrder()">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      New Dashboard
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Loading orders...</p>
+  </div>
+
+  <div *ngIf="!loading && !isAdmin && clientOrders.length === 0" class="empty-state">
+    <svg class="empty-icon" width="120" height="120" viewBox="0 0 80 80" fill="none">
+      <path d="M10 20C10 15.5817 13.5817 12 18 12H30L36 18H62C66.4183 18 70 21.5817 70 26V60C70 64.4183 66.4183 68 62 68H18C13.5817 68 10 64.4183 10 60V20Z" stroke="#475569" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <h2>No orders yet</h2>
+    <p>Start your first dashboard</p>
+    <button class="btn-create-first" (click)="createNewOrder()">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      Create First Dashboard
+    </button>
+  </div>
+
+  <div *ngIf="!loading && isAdmin && adminOrders.length === 0" class="empty-state">
+    <svg class="empty-icon" width="120" height="120" viewBox="0 0 80 80" fill="none">
+      <path d="M10 20C10 15.5817 13.5817 12 18 12H30L36 18H62C66.4183 18 70 21.5817 70 26V60C70 64.4183 66.4183 68 62 68H18C13.5817 68 10 64.4183 10 60V20Z" stroke="#475569" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <h2>No orders yet</h2>
+    <p>Start your first dashboard</p>
+    <button class="btn-create-first" (click)="createNewOrder()">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      Create First Dashboard
+    </button>
+  </div>
+
+  <div *ngIf="!loading && !isAdmin && clientOrders.length > 0" class="orders-grid">
+    <div *ngFor="let order of clientOrders" class="order-card">
+      <div class="card-header">
+        <svg class="folder-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M2 5C2 3.89543 2.89543 3 4 3H7L9 5H16C17.1046 5 18 5.89543 18 7V15C18 16.1046 17.1046 17 16 17H4C2.89543 17 2 16.1046 2 15V5Z" stroke="#60a5fa" stroke-width="2"/>
+        </svg>
+        <span class="status-badge" [class.completed]="order.currentStatus" [class.draft]="!order.currentStatus">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path *ngIf="order.currentStatus" d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <circle *ngIf="!order.currentStatus" cx="6" cy="6" r="5" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          {{ order.currentStatus ? 'Completed' : 'Draft' }}
+        </span>
+      </div>
+      <h3>{{ order.productName }}</h3>
+      <p class="order-date">Created {{ order.orderDate }}</p>
+      <div *ngIf="order.currentStatus" class="order-stats">
+        {{ order.orderSum }} components generated
+      </div>
+      <div *ngIf="!order.currentStatus" class="order-actions">
+        <button class="btn-edit" (click)="editOrder(order)">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Edit
+        </button>
+        <button class="btn-delete" (click)="deleteOrder(order.orderId)">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+            <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && isAdmin && adminOrders.length > 0" class="orders-grid">
+    <div *ngFor="let order of adminOrders" class="order-card">
+      <div class="card-header">
+        <svg class="folder-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M2 5C2 3.89543 2.89543 3 4 3H7L9 5H16C17.1046 5 18 5.89543 18 7V15C18 16.1046 17.1046 17 16 17H4C2.89543 17 2 16.1046 2 15V5Z" stroke="#60a5fa" stroke-width="2"/>
+        </svg>
+        <span class="status-badge" [class.completed]="order.currentStatus" [class.draft]="!order.currentStatus">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path *ngIf="order.currentStatus" d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <circle *ngIf="!order.currentStatus" cx="6" cy="6" r="5" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          {{ order.currentStatus ? 'Completed' : 'Draft' }}
+        </span>
+      </div>
+      <h3>{{ order.productName }}</h3>
+      <p class="order-user">User: {{ order.userName }}</p>
+      <p class="order-date">Created {{ order.orderDate }}</p>
+      <div *ngIf="order.currentStatus" class="order-stats">
+        {{ order.orderSum }} components generated
+      </div>
+      <div *ngIf="!order.currentStatus" class="order-actions">
+        <button class="btn-edit" (click)="editOrder(order)">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Edit
+        </button>
+        <button class="btn-delete" (click)="deleteOrder(order.orderId)">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+            <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
