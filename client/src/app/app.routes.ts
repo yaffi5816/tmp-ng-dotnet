@@ -7,12 +7,16 @@ import { UsersComponent } from './components/users/users';
 import { ProductsComponent } from './components/products/products';
 import { CartComponent } from './components/cart/cart';
 import { ProductDetailComponent } from './components/product-detail/product-detail';
+import { PaymentComponent } from './components/payment.component';
+import { CodeViewerComponent } from './components/code-viewer.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   { path: 'home', component: Home },
   { path: 'login', component: Login },
   { path: 'dashboard', component: DashboardComponent },
+  { path: 'payment', component: PaymentComponent },
+  { path: 'code-viewer', component: CodeViewerComponent },
   { path: 'orders', component: ProjectsComponent },
   { path: 'products', component: ProductsComponent },
   { path: 'product/:id', component: ProductDetailComponent },

@@ -68,7 +68,6 @@ export class CartComponent implements OnInit {
     this.orderService.createOrder(order).subscribe({
       next: (createdOrder) => {
         localStorage.setItem('currentOrderId', createdOrder.orderId!.toString());
-        this.cartService.clearCart();
         this.router.navigate(['/dashboard']);
       },
       error: (err) => console.error('Error creating order:', err)

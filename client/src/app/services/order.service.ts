@@ -7,16 +7,22 @@ export interface Order {
   userId: number;
   orderDate?: Date;
   status: 'draft' | 'completed';
-  totalAmount: number;
+  currentStatus?: boolean;
+  ordersSum?: number;
+  totalAmount?: number;
   dashboardCode?: string;
+  generatedCode?: string;
   codeApproved?: boolean;
   ordersItems: OrderItem[];
 }
 
 export interface OrderItem {
+  orderItemId?: number;
   productId: number;
+  orderId?: number;
   quantity: number;
-  price: number;
+  price?: number;
+  product?: any;
 }
 
 @Injectable({
@@ -45,6 +51,10 @@ export class OrderService {
 
   completeOrder(orderId: number): Observable<any> {
     return this.http.put(`${this.apiUrl}/${orderId}/complete`, {});
+  }
+
+  updateOrder(orderId: number, orderData: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${orderId}`, orderData);
   }
 
   suspendOrder(orderId: number): Observable<any> {

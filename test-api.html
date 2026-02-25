@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Dashboard API</title>
+</head>
+<body>
+    <h1>Test Dashboard Generation</h1>
+    <button onclick="testAPI()">Generate Dashboard</button>
+    <pre id="result"></pre>
+
+    <script>
+        async function testAPI() {
+            const result = document.getElementById('result');
+            result.textContent = 'Loading...';
+            
+            try {
+                const response = await fetch('http://localhost:5034/api/dashboard/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        schema: {
+                            users: ['id', 'name', 'email'],
+                            orders: ['id', 'userId', 'total', 'date']
+                        },
+                        components: ['BarChart', 'KPI Card', 'Table']
+                    })
+                });
+
+                const data = await response.json();
+                result.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                result.textContent = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

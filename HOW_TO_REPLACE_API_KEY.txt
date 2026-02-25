@@ -1,0 +1,19 @@
+# הוראות להחלפת API Key
+
+1. צרי API Key חדש: https://aistudio.google.com/apikey
+
+2. פתחי את הקובץ:
+   c:\Users\y0533\Desktop\DashGen\.env
+
+3. החליפי את השורה:
+   GEMINI_API_KEY=AIzaSyDhYGzYRPEldwM0jLq30Td8lkYD8jj4Dp4
+   
+   ל:
+   GEMINI_API_KEY=<המפתח החדש שלך>
+
+4. העתיקי גם ל:
+   c:\Users\y0533\Desktop\DashGen\WebApi\WebApiShop\WebApiShop\.env
+
+5. עצרי את השרת והריצי מחדש
+
+זה יפתור את בעיית המכסה!

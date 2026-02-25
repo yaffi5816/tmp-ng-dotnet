@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -9,6 +10,7 @@ import { DashboardService } from '../../services/dashboard.service';
 import { CartService } from '../../services/cart.service';
 import { SchemaDialogComponent } from '../schema-dialog/schema-dialog.component';
 import { FileDialogComponent } from '../file-dialog/file-dialog.component';
+import { SuccessDialogComponent } from '../success-dialog.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -17,6 +19,7 @@ import { FileDialogComponent } from '../file-dialog/file-dialog.component';
     CommonModule,
     FormsModule,
     MatButtonModule,
+    MatCheckboxModule,
     MatDialogModule,
     MatProgressSpinnerModule
   ],
@@ -50,6 +53,12 @@ import { FileDialogComponent } from '../file-dialog/file-dialog.component';
       </div>
 
       <div class="schema-input-section">
+        <div class="skip-gemini-option">
+          <label>
+            <input type="checkbox" [(ngModel)]="skipGemini">
+            <span>דלג על Gemini (השתמש ב-HTML דמה)</span>
+          </label>
+        </div>
         <textarea 
           class="schema-textarea" 
           [placeholder]="placeholderText"
@@ -163,6 +172,28 @@ import { FileDialogComponent } from '../file-dialog/file-dialog.component';
     .schema-input-section {
       max-width: 1200px;
       margin: 0 auto;
+    }
+    .skip-gemini-option {
+      margin-bottom: 20px;
+      padding: 16px;
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 8px;
+    }
+    .skip-gemini-option label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      font-size: 16px;
+      color: #94a3b8;
+    }
+    .skip-gemini-option input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-left: 12px;
+      cursor: pointer;
+    }
+    .skip-gemini-option span {
+      user-select: none;
     }
     .schema-textarea {
       width: 100%;
@@ -328,6 +359,7 @@ export class DashboardComponent {
   loading = false;
   schemaText = '';
   refinementRequest = '';
+  skipGemini = false;
   placeholderText = `Paste your schema here...
 
 Example JSON:
@@ -362,7 +394,11 @@ Example JSON:
 
   openSchemaDialog(): void {
     const dialogRef = this.dialog.open(SchemaDialogComponent, {
-      width: '600px'
+      width: '100vw',
+      height: '100vh',
+      maxWidth: '100vw',
+      panelClass: 'fullscreen-dialog',
+      hasBackdrop: false
     });
 
     dialogRef.afterClosed().subscribe(schema => {
@@ -374,7 +410,11 @@ Example JSON:
 
   openFileDialog(): void {
     const dialogRef = this.dialog.open(FileDialogComponent, {
-      width: '600px'
+      width: '100vw',
+      height: '100vh',
+      maxWidth: '100vw',
+      panelClass: 'fullscreen-dialog',
+      hasBackdrop: false
     });
 
     dialogRef.afterClosed().subscribe(file => {
@@ -386,15 +426,32 @@ Example JSON:
 
   generateFromSchema(schema: string): void {
     this.loading = true;
-    this.dashboardService.generateFromSchema(schema, this.selectedProducts).subscribe({
+    const cartItems = this.cartService.getItems();
+    const totalAmount = this.cartService.getTotalPrice();
+    localStorage.setItem('orderItems', JSON.stringify(cartItems));
+    localStorage.setItem('orderTotal', totalAmount.toString());
+    localStorage.setItem('originalSchema', schema);
+    
+    this.dashboardService.generateFromSchema(schema, this.selectedProducts, this.skipGemini).subscribe({
       next: (response) => {
-        this.generatedCode = response.html;
-        this.showCodeEditor = true;
+        const decodedCode = this.decodeHtmlEntities(response.generatedCode);
+        this.generatedCode = decodedCode;
+        localStorage.setItem('generatedCode', decodedCode);
         this.loading = false;
+        
+        const dialogRef = this.dialog.open(SuccessDialogComponent, {
+          width: '500px',
+          disableClose: true,
+          data: { totalAmount }
+        });
+        
+        dialogRef.afterClosed().subscribe(result => {
+          this.showCodeEditor = true;
+        });
       },
       error: (error) => {
         console.error('Error:', error);
-        alert('Error generating Dashboard');
+        alert('Error generating Dashboard: ' + error.message);
         this.loading = false;
       }
     });
@@ -402,15 +459,38 @@ Example JSON:
 
   generateFromFile(file: File): void {
     this.loading = true;
-    this.dashboardService.generateFromFile(file, this.selectedProducts).subscribe({
+    const reader = new FileReader();
+    reader.onload = () => {
+      const schema = reader.result as string;
+      localStorage.setItem('originalSchema', schema);
+    };
+    reader.readAsText(file);
+    
+    const cartItems = this.cartService.getItems();
+    const totalAmount = this.cartService.getTotalPrice();
+    localStorage.setItem('orderItems', JSON.stringify(cartItems));
+    localStorage.setItem('orderTotal', totalAmount.toString());
+    
+    this.dashboardService.generateFromFile(file, this.selectedProducts, this.skipGemini).subscribe({
       next: (response) => {
-        this.generatedCode = response.html;
-        this.showCodeEditor = true;
+        const decodedCode = this.decodeHtmlEntities(response.generatedCode);
+        this.generatedCode = decodedCode;
+        localStorage.setItem('generatedCode', decodedCode);
         this.loading = false;
+        
+        const dialogRef = this.dialog.open(SuccessDialogComponent, {
+          width: '500px',
+          disableClose: true,
+          data: { totalAmount }
+        });
+        
+        dialogRef.afterClosed().subscribe(result => {
+          this.showCodeEditor = true;
+        });
       },
       error: (error) => {
         console.error('Error:', error);
-        alert('Error generating Dashboard');
+        alert('Error generating Dashboard: ' + error.message);
         this.loading = false;
       }
     });
@@ -433,22 +513,12 @@ Example JSON:
   }
 
   requestRefinement(): void {
-    if (!this.refinementRequest.trim()) {
-      alert('Please enter refinement instructions');
-      return;
-    }
-    this.loading = true;
-    this.dashboardService.refineCode(this.generatedCode, this.refinementRequest).subscribe({
-      next: (response) => {
-        this.generatedCode = response.html;
-        this.refinementRequest = '';
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('Error:', error);
-        alert('Error refining code');
-        this.loading = false;
-      }
-    });
+    alert('Refinement feature coming soon!');
+  }
+
+  private decodeHtmlEntities(text: string): string {
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = text;
+    return textarea.value;
   }
 }

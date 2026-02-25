@@ -70,6 +70,10 @@ export class CartService {
     return this.items;
   }
 
+  getTotalPrice(): number {
+    return this.items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+  }
+
   getTotal(): number {
     return this.items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
   }

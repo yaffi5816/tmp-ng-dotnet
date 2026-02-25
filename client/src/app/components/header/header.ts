@@ -1,14 +1,16 @@
 import { Component } from '@angular/core';
 import { HeaderService } from '../../services/header.service';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CartService } from '../../services/cart.service';
 import { UserService } from '../../services/user.service';
 import { ProductService } from '../../services/product.service';
+import { OrderService } from '../../services/order.service';
 import { OrderItem } from '../../../models/order-item.model';
 import { UserUpdate } from '../../../models/user.model';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-header',
@@ -23,8 +25,9 @@ export class Header {
   lastName = '';
   isAdmin = false;
   cartItems: OrderItem[] = [];
-  showCartPreview = false;
+  showCartSidebar = false;
   showUserModal = false;
+  isCartPage = false;
   userForm: UserUpdate = {
     userName: '',
     firstName: '',
@@ -38,7 +41,8 @@ export class Header {
     private authService: AuthService,
     public cartService: CartService,
     private userService: UserService,
-    private productService: ProductService
+    private productService: ProductService,
+    private orderService: OrderService
   ) {
     this.cartService.cart$.subscribe(items => {
       this.cartItems = items;
@@ -56,6 +60,11 @@ export class Header {
         this.lastName = '';
         this.isAdmin = false;
       }
+    });
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: any) => {
+      this.isCartPage = event.url === '/cart';
     });
   }
 
@@ -95,8 +104,16 @@ export class Header {
     this.router.navigate(['/users']);
   }
 
+  toggleCartSidebar() {
+    this.showCartSidebar = !this.showCartSidebar;
+  }
+
+  closeCartSidebar() {
+    this.showCartSidebar = false;
+  }
+
   goToCart() {
-    this.showCartPreview = false;
+    this.showCartSidebar = false;
     this.router.navigate(['/cart']);
   }
 
@@ -115,6 +132,34 @@ export class Header {
 
   closeUserModal() {
     this.showUserModal = false;
+  }
+
+  checkout() {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    const order = {
+      userId: parseInt(userId),
+      status: 'draft' as const,
+      totalAmount: this.cartService.getTotal(),
+      ordersItems: this.cartItems.map(item => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        price: item.product.price
+      }))
+    };
+
+    this.orderService.createOrder(order).subscribe({
+      next: (createdOrder) => {
+        localStorage.setItem('currentOrderId', createdOrder.orderId!.toString());
+        this.showCartSidebar = false;
+        this.router.navigate(['/dashboard']);
+      },
+      error: (err) => console.error('Error creating order:', err)
+    });
   }
 
   saveUserProfile() {

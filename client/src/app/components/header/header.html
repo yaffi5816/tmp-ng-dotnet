@@ -60,35 +60,70 @@
         Logout
       </button>
       
-      <div class="cart-container" (mouseenter)="showCartPreview = true" (mouseleave)="showCartPreview = false">
-        <button class="nav-btn cart-btn" (click)="goToCart()">
+      <div class="cart-container">
+        <button class="nav-btn cart-btn" (click)="!isCartPage && toggleCartSidebar()" [class.disabled]="isCartPage">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             <path d="M3 3h2l.4 2M7 13h10l2-7H5.4M7 13L5.4 5M7 13l-1.5 2M17 13l1.5 2M9 17a1 1 0 11-2 0 1 1 0 012 0zM17 17a1 1 0 11-2 0 1 1 0 012 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
           <span>Cart</span>
           <span *ngIf="cartService.getItemCount() > 0" class="cart-badge">{{ cartService.getItemCount() }}</span>
         </button>
-        
-        <div *ngIf="showCartPreview && cartItems.length > 0" class="cart-preview">
-          <div class="cart-preview-items">
-            <div *ngFor="let item of cartItems" class="cart-preview-item">
-              <img [src]="getImageUrl(item.product?.imgUrl)" [alt]="item.product?.productName" class="cart-preview-img">
-              <div class="cart-preview-info">
-                <span class="cart-preview-name">{{ item.product?.productName }}</span>
-                <span class="cart-preview-price">{{ item.quantity }} x {{ item.product?.price }} ₪</span>
-              </div>
-            </div>
-          </div>
-          <div class="cart-preview-total">
-            <span>Total:</span>
-            <span>{{ cartService.getTotal() }} ₪</span>
-          </div>
-          <button class="cart-preview-btn" (click)="goToCart()">Go to Cart</button>
-        </div>
       </div>
     </nav>
   </div>
 </header>
+
+<div class="cart-sidebar" [class.open]="showCartSidebar">
+  <div class="cart-sidebar-header">
+    <h3>Shopping Cart</h3>
+    <button class="btn-close-sidebar" (click)="closeCartSidebar()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M6 6L18 18M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <div *ngIf="cartItems.length === 0" class="cart-sidebar-empty">
+    <svg width="60" height="60" viewBox="0 0 20 20" fill="none">
+      <path d="M3 3h2l.4 2M7 13h10l2-7H5.4M7 13L5.4 5M7 13l-1.5 2M17 13l1.5 2M9 17a1 1 0 11-2 0 1 1 0 012 0zM17 17a1 1 0 11-2 0 1 1 0 012 0z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <p>Your cart is empty</p>
+  </div>
+
+  <div *ngIf="cartItems.length > 0" class="cart-sidebar-content">
+    <div class="cart-sidebar-items">
+      <div *ngFor="let item of cartItems" class="cart-sidebar-item">
+        <img [src]="getImageUrl(item.product?.imgUrl)" [alt]="item.product?.productName">
+        <div class="cart-sidebar-item-info">
+          <h4>{{ item.product?.productName }}</h4>
+          <p class="cart-sidebar-item-price">${{ item.product?.price }} x {{ item.quantity }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="cart-sidebar-footer">
+      <div class="cart-sidebar-total">
+        <span>Total:</span>
+        <span>${{ cartService.getTotal() }}</span>
+      </div>
+      <button class="btn-checkout-sidebar" (click)="checkout()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M9 2L3 6V9C3 13.55 6.84 17.74 9 18C11.16 17.74 15 13.55 15 9V6L9 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M7 9L9 11L13 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Checkout
+      </button>
+      <button class="btn-goto-cart" (click)="goToCart()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        View Full Cart
+      </button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showCartSidebar" class="cart-sidebar-overlay" (click)="closeCartSidebar()"></div>
 
 <div *ngIf="showUserModal" class="modal-overlay" (click)="closeUserModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">

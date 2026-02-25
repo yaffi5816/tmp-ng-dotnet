@@ -18,14 +18,14 @@ namespace Services
 
         public EmailService(IConfiguration configuration)
         {
-            _fromEmail = configuration["EmailSettings:FromEmail"] ?? "dashgen26@gmail.com";
+            _fromEmail = configuration["EmailSettings:FromEmail"] ?? "yafi3155816@gmail.com";
             _appPassword = configuration["EmailSettings:AppPassword"] ?? "";
         }
 
         public async Task SendCodeEmailAsync(string toEmail, string code, string fileName)
         {
             var message = new MimeMessage();
-            message.From.Add(new MailboxAddress("DashGen", "yafi3155816@gmail.com"));
+            message.From.Add(new MailboxAddress("DashGen", _fromEmail));
             message.To.Add(new MailboxAddress("", toEmail));
             message.Subject = "Your Generated Dashboard Code";
             message.Body = new TextPart("plain")
@@ -37,7 +37,7 @@ namespace Services
             {
                 await client.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
                 //await client.AuthenticateAsync("dashgen2026@gmail.com", "kpgitvtdeyigdhok");
-                await client.AuthenticateAsync("yafi3155816@gmail.com", "iqrptdsiikeofqti");
+                await client.AuthenticateAsync(_fromEmail, _appPassword);
                 await client.SendAsync(message);
                 await client.DisconnectAsync(true);
             }

@@ -9,6 +9,9 @@ public class DashboardRequest
     
     [JsonPropertyName("components")]
     public List<string> Components { get; set; } = new();
+    
+    [JsonPropertyName("skipGemini")]
+    public bool SkipGemini { get; set; } = false;
 }
 
 public class GeminiSettings

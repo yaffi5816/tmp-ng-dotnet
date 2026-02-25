@@ -32,7 +32,8 @@ export class AuthService {
 
   clearCartOnLogout(): void {
     localStorage.removeItem('cart');
-    localStorage.removeItem('cartOwner');
+    // localStorage.removeItem('cartOwner');
+    
   }
 
   isLoggedIn(): boolean {

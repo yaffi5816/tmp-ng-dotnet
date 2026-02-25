@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { OrderService, Order } from '../../services/order.service';
+import { ProductService } from '../../services/product.service';
 
 @Component({
   selector: 'app-projects',
@@ -13,7 +15,11 @@ export class ProjectsComponent implements OnInit {
   orders: Order[] = [];
   selectedOrder: Order | null = null;
 
-  constructor(private orderService: OrderService) {}
+  constructor(
+    private orderService: OrderService,
+    private productService: ProductService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.loadOrders();
@@ -29,8 +35,13 @@ export class ProjectsComponent implements OnInit {
     }
   }
 
+  getImageUrl(imgUrl: string | null): string {
+    return this.productService.getImageUrl(imgUrl);
+  }
+
   viewOrder(order: Order) {
-    this.selectedOrder = order;
+    sessionStorage.setItem('selectedOrder', JSON.stringify(order));
+    this.router.navigate(['/order-detail', order.orderId]);
   }
 
   approveCode(orderId: number) {

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Dashboard API</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #1a1a1a; color: #fff; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; background: #3b82f6; color: white; border: none; border-radius: 5px; }
+        button:hover { background: #2563eb; }
+        pre { background: #2a2a2a; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        .error { color: #ef4444; }
+        .success { color: #10b981; }
+    </style>
+</head>
+<body>
+    <h1>Test Dashboard Generation API</h1>
+    <button onclick="testAPI()">🚀 Generate Dashboard</button>
+    <div id="status"></div>
+    <pre id="result"></pre>
+
+    <script>
+        async function testAPI() {
+            const status = document.getElementById('status');
+            const result = document.getElementById('result');
+            
+            status.innerHTML = '<p>⏳ Sending request...</p>';
+            result.textContent = '';
+            
+            const requestBody = {
+                schema: {
+                    users: ['id', 'name', 'email'],
+                    orders: ['id', 'userId', 'total', 'date']
+                },
+                components: ['BarChart', 'KPI Card', 'Table']
+            };
+
+            console.log('Request:', requestBody);
+            
+            try {
+                const response = await fetch('http://localhost:5034/api/dashboard/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    status.innerHTML = '<p class="success">✅ Success!</p>';
+                    result.textContent = JSON.stringify(data, null, 2);
+                } else {
+                    status.innerHTML = '<p class="error">❌ Error ' + response.status + '</p>';
+                    result.textContent = JSON.stringify(data, null, 2);
+                }
+            } catch (error) {
+                status.innerHTML = '<p class="error">❌ Network Error</p>';
+                result.textContent = error.message;
+            }
+        }
+    </script>
+</body>
+</html>

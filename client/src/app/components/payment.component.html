@@ -1,0 +1,79 @@
+<div class="payment-container">
+  <div class="payment-header">
+    <h1>Complete Your Payment</h1>
+    <p>Secure checkout for your custom dashboard</p>
+  </div>
+
+  <div class="payment-content">
+    <div class="order-summary">
+      <h2>Order Summary</h2>
+      <div class="summary-card">
+        <div class="summary-item" *ngFor="let item of cartItems">
+          <div class="item-info">
+            <img [src]="getImageUrl(item.product.imgUrl)" [alt]="item.product.productName" class="item-image">
+            <div>
+              <h3>{{item.product.productName}}</h3>
+              <p>{{item.product.categoryName}} × {{item.quantity}}</p>
+            </div>
+          </div>
+          <div class="item-price">${{(item.product.price * item.quantity).toFixed(2)}}</div>
+        </div>
+        <div class="summary-divider"></div>
+        <div class="summary-total">
+          <span>Total</span>
+          <span class="total-amount">${{totalAmount.toFixed(2)}}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="payment-form-section">
+      <h2>Payment Information</h2>
+      <form class="payment-form" (ngSubmit)="processPayment()">
+        <div class="form-group">
+          <label>Card Number</label>
+          <input type="text" [(ngModel)]="cardNumber" name="cardNumber" 
+                 placeholder="1234 5678 9012 3456" maxlength="19" required>
+        </div>
+
+        <div class="form-group">
+          <label>Cardholder Name</label>
+          <input type="text" [(ngModel)]="cardName" name="cardName" 
+                 placeholder="John Doe" required>
+        </div>
+
+        <div class="form-row expiry-row">
+          <div class="form-group">
+            <label>Expiry Date</label>
+            <input type="text" [(ngModel)]="expiryDate" name="expiryDate" 
+                   (input)="formatExpiryDate($event)"
+                   placeholder="MM/YY" maxlength="5" required>
+          </div>
+        </div>
+
+        <div class="form-group cvv-input">
+          <label>CVV</label>
+          <input type="password" [(ngModel)]="cvv" name="cvv"
+                 placeholder="123" maxlength="3" required>
+        </div>
+
+        <button type="submit" class="btn-pay" [disabled]="processing || !isFormValid()">
+          <span *ngIf="!processing">🔒 Pay ${{totalAmount.toFixed(2)}}</span>
+          <span *ngIf="processing">
+            <mat-spinner diameter="20" style="display: inline-block; margin-right: 8px;"></mat-spinner>
+            Processing...
+          </span>
+        </button>
+
+        <div class="secure-badge">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L4 6V12C4 16.55 7.16 20.74 12 22C16.84 20.74 20 16.55 20 12V6L12 2Z" 
+                  fill="currentColor" opacity="0.2"/>
+            <path d="M12 2L4 6V12C4 16.55 7.16 20.74 12 22C16.84 20.74 20 16.55 20 12V6L12 2Z" 
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Secure 256-bit SSL Encryption</span>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
