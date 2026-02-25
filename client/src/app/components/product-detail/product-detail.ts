@@ -24,7 +24,12 @@ export class ProductDetailComponent implements OnInit {
     private cartService: CartService
   ) {}
 
+  getImageUrl(imgUrl: string | null): string {
+    return this.productService.getImageUrl(imgUrl);
+  }
+
   ngOnInit() {
+    window.scrollTo(0, 0);
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (id) {
       this.productService.getProductById(id).subscribe({

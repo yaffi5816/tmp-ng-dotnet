@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CartService } from '../../services/cart.service';
 import { UserService } from '../../services/user.service';
+import { ProductService } from '../../services/product.service';
 import { OrderItem } from '../../../models/order-item.model';
 import { UserUpdate } from '../../../models/user.model';
 
@@ -36,7 +37,8 @@ export class Header {
     private router: Router,
     private authService: AuthService,
     public cartService: CartService,
-    private userService: UserService
+    private userService: UserService,
+    private productService: ProductService
   ) {
     this.cartService.cart$.subscribe(items => {
       this.cartItems = items;
@@ -55,6 +57,10 @@ export class Header {
         this.isAdmin = false;
       }
     });
+  }
+
+  getImageUrl(imgUrl: string | null): string {
+    return this.productService.getImageUrl(imgUrl);
   }
 
   goToHome() {

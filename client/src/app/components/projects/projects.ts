@@ -1,101 +1,78 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
-import { OrdersService } from '../../services/projects.service';
-import { CartService } from '../../services/cart.service';
-import { AdminOrder } from '../../../models/admin-project.model';
-import { ClientOrder } from '../../../models/client-project.model';
+import { OrderService, Order } from '../../services/order.service';
 
 @Component({
-  selector: 'app-orders',
+  selector: 'app-projects',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './projects.html',
-  styleUrl: './projects.css',
+  styleUrls: ['./projects.css']
 })
-export class OrdersComponent implements OnInit {
-    clientOrders: ClientOrder[] = [];
-    adminOrders: AdminOrder[] = [];
-    isAdmin = false;
-    loading = true;
-    
-    constructor(
-      private orderService: OrdersService,
-      private authService: AuthService,
-      private cartService: CartService,
-      private router: Router
-    ) {}
+export class ProjectsComponent implements OnInit {
+  orders: Order[] = [];
+  selectedOrder: Order | null = null;
 
-    ngOnInit() {
-      const userId = this.authService.getUsername();
-      this.isAdmin = this.authService.isAdmin();
-      this.loadOrders();
-    }
+  constructor(private orderService: OrderService) {}
 
-    loadOrders() {
-      const currentUserId = parseInt(localStorage.getItem('userId') || '0');
-      if (this.isAdmin) {
-        this.orderService.getAllOrders(currentUserId).subscribe({
-          next: (data) => {
-            this.adminOrders = data;
-            this.loading = false;
-          },
-          error: (error) => {
-            console.error('Error fetching orders:', error);
-            this.loading = false;
-          }
-        });
-      } else {
-        this.orderService.getClientOrders(currentUserId).subscribe({
-          next: (data) => {
-            this.clientOrders = data;
-            this.loading = false;
-          },
-          error: (error) => {
-            console.error('Error fetching orders:', error);
-            this.loading = false;
-          }
-        });
-      }
-    }
+  ngOnInit() {
+    this.loadOrders();
+  }
 
-    createNewOrder() {
-      // ניווט ליצירת הזמנה חדשה
-    }
-
-    deleteOrder(orderId: number) {
-      if (confirm('Are you sure you want to delete this draft order?')) {
-        this.orderService.deleteOrder(orderId).subscribe({
-          next: () => {
-            this.loadOrders();
-          },
-          error: (error) => console.error('Error deleting order:', error)
-        });
-      }
-    }
-
-    editOrder(order: any) {
-      this.orderService.getOrder(order.orderId).subscribe({
-        next: (orderData: any) => {
-          console.log('Order data:', orderData);
-          this.cartService.clearCart();
-          
-          if (orderData.ordersItems && orderData.ordersItems.length > 0) {
-            orderData.ordersItems.forEach((item: any) => {
-              console.log('Item:', item);
-              if (item.product) {
-                this.cartService.addToCart(item.product, item.quantity);
-              }
-            });
-          }
-          
-          this.router.navigate(['/cart']);
-        },
-        error: (error) => {
-          console.error('Error loading order:', error);
-          alert('Failed to load order');
-        }
+  loadOrders() {
+    const userId = localStorage.getItem('userId');
+    if (userId) {
+      this.orderService.getUserOrders(parseInt(userId)).subscribe({
+        next: (orders) => this.orders = orders,
+        error: (err) => console.error('Error loading orders:', err)
       });
     }
+  }
+
+  viewOrder(order: Order) {
+    this.selectedOrder = order;
+  }
+
+  approveCode(orderId: number) {
+    this.orderService.approveCode(orderId).subscribe({
+      next: () => this.loadOrders(),
+      error: (err) => console.error('Error approving code:', err)
+    });
+  }
+
+  proceedToPayment(orderId: number) {
+    this.orderService.completeOrder(orderId).subscribe({
+      next: () => {
+        alert('התשלום בוצע בהצלחה! הקוד נשלח למייל');
+        this.loadOrders();
+      },
+      error: (err) => console.error('Error completing order:', err)
+    });
+  }
+
+  suspendOrder(orderId: number) {
+    this.orderService.suspendOrder(orderId).subscribe({
+      next: () => {
+        alert('ההזמנה הושהתה');
+        this.loadOrders();
+      },
+      error: (err) => console.error('Error suspending order:', err)
+    });
+  }
+
+  downloadCode(orderId: number) {
+    this.orderService.downloadCode(orderId).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `dashboard-${orderId}.zip`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        
+        this.orderService.completeOrder(orderId).subscribe(() => this.loadOrders());
+      },
+      error: (err) => console.error('Error downloading code:', err)
+    });
+  }
 }

@@ -72,16 +72,16 @@
         <div *ngIf="showCartPreview && cartItems.length > 0" class="cart-preview">
           <div class="cart-preview-items">
             <div *ngFor="let item of cartItems" class="cart-preview-item">
-              <img [src]="item.product.imgUrl || 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=100'" [alt]="item.product.productName">
+              <img [src]="getImageUrl(item.product?.imgUrl)" [alt]="item.product?.productName" class="cart-preview-img">
               <div class="cart-preview-info">
-                <span class="cart-preview-name">{{ item.product.productName }}</span>
-                <span class="cart-preview-price">{{ item.quantity }} x ${{ item.product.price }}</span>
+                <span class="cart-preview-name">{{ item.product?.productName }}</span>
+                <span class="cart-preview-price">{{ item.quantity }} x {{ item.product?.price }} ₪</span>
               </div>
             </div>
           </div>
           <div class="cart-preview-total">
             <span>Total:</span>
-            <span>${{ cartService.getTotal() }}</span>
+            <span>{{ cartService.getTotal() }} ₪</span>
           </div>
           <button class="cart-preview-btn" (click)="goToCart()">Go to Cart</button>
         </div>

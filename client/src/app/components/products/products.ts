@@ -131,12 +131,14 @@ export class ProductsComponent implements OnInit {
   goToPage(page: number) {
     this.currentPage = page;
     this.loadProducts();
+    window.scrollTo(0, 0);
   }
 
   nextPage() {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
       this.loadProducts();
+      window.scrollTo(0, 0);
     }
   }
 
@@ -144,6 +146,7 @@ export class ProductsComponent implements OnInit {
     if (this.currentPage > 1) {
       this.currentPage--;
       this.loadProducts();
+      window.scrollTo(0, 0);
     }
   }
 

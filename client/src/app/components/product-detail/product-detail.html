@@ -14,7 +14,7 @@
 
     <div class="product-content">
       <div class="product-image-large">
-        <img [src]="product.imgUrl || 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=800'" [alt]="product.productName">
+        <img [src]="getImageUrl(product.imgUrl)" [alt]="product.productName">
       </div>
 
       <div class="product-info">

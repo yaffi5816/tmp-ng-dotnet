@@ -1,31 +1,32 @@
 import { Injectable } from '@angular/core';
-import { ClientOrder } from '../../models/client-project.model';
-import { AdminOrder } from '../../models/admin-project.model';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Order } from '../../models/order.model';
+
+export interface Project {
+  projectId?: number;
+  orderId: number;
+  dashboardCode: string;
+  createdDate?: Date;
+  status: 'pending' | 'approved' | 'completed';
+}
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
-export class OrdersService {
-    private apiUrl='http://localhost:5034/api/Orders';
-    
-    constructor(private http: HttpClient) {}
+export class ProjectsService {
+  private apiUrl = 'http://localhost:5034/api/Projects';
 
-    getClientOrders(userId: number): Observable<ClientOrder[]> {
-      return this.http.get<ClientOrder[]>(`${this.apiUrl}?userId=${userId}`);
-    }
+  constructor(private http: HttpClient) {}
 
-    getAllOrders(adminId: number): Observable<AdminOrder[]> {
-      return this.http.get<AdminOrder[]>(`${this.apiUrl}/admin?currentUserId=${adminId}`);
-    }
+  getUserProjects(userId: number): Observable<Project[]> {
+    return this.http.get<Project[]>(`${this.apiUrl}/user/${userId}`);
+  }
 
-    getOrder(orderId: number): Observable<Order> {
-      return this.http.get<Order>(`${this.apiUrl}/${orderId}`);
-    }
+  getProjectById(projectId: number): Observable<Project> {
+    return this.http.get<Project>(`${this.apiUrl}/${projectId}`);
+  }
 
-    deleteOrder(orderId: number): Observable<void> {
-      return this.http.delete<void>(`${this.apiUrl}/${orderId}`);
-    }
+  approveProject(projectId: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${projectId}/approve`, {});
+  }
 }
