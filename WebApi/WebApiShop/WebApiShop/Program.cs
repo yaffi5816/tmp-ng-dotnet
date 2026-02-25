@@ -3,6 +3,9 @@ using Repositories;
 using Services;
 using DTO;
 
+DotNetEnv.Env.Load();
+var apiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY");
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -10,10 +13,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 // Gemini Configuration
-builder.Services.Configure<GeminiSettings>(builder.Configuration.GetSection("GeminiSettings"));
+builder.Services.Configure<GeminiSettings>(options =>
+{
+    options.ApiKey = apiKey;
+    options.BaseUrl = builder.Configuration["GeminiSettings:BaseUrl"];
+});
 builder.Services.Configure<AdminCredentials>(builder.Configuration.GetSection("AdminCredentials"));
-builder.Services.AddHttpClient<IGeminiRepository, GeminiRepository>();
-builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddHttpClient<IGeminiService, GeminiService>();
 
 // CORS Policy
 builder.Services.AddCors(options =>
@@ -22,12 +28,16 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("http://localhost:4200")
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .AllowCredentials();
     });
 });
 
 
-
+builder.Services.AddControllers()
+    .AddJsonOptions(options => {
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    });
 
 
 builder.Services.AddScoped<IUserService, UserService>();
@@ -41,6 +51,8 @@ builder.Services.AddTransient<IProductService, ProductService>();
 
 builder.Services.AddTransient<IOrderRepository, OrderRepository>();
 builder.Services.AddTransient<IOrderService, OrderService>();
+
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 builder.Services.AddDbContext<DashGen2026Context>(
     options=>options.UseSqlServer(
@@ -62,9 +74,9 @@ if (app.Environment.IsDevelopment())
 }
 // Configure the HTTP request pipeline.
 
-app.UseHttpsRedirection();
-
 app.UseCors("AllowAngular");
+
+app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
