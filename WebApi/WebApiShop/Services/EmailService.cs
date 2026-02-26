@@ -8,7 +8,8 @@ namespace Services
 {
     public interface IEmailService
     {
-        Task SendCodeEmailAsync(string toEmail, string code, string fileName);
+        Task SendCodeEmailAsync(string toEmail, string code, string fileName, string? subject);
+        Task SendContactEmailAsync(string name, string fromEmail, string subject, string message);
     }
 
     public class EmailService : IEmailService
@@ -22,12 +23,12 @@ namespace Services
             _appPassword = configuration["EmailSettings:AppPassword"] ?? "";
         }
 
-        public async Task SendCodeEmailAsync(string toEmail, string code, string fileName)
+        public async Task SendCodeEmailAsync(string toEmail, string code, string fileName, string? subject)
         {
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress("DashGen", _fromEmail));
             message.To.Add(new MailboxAddress("", toEmail));
-            message.Subject = "Your Generated Dashboard Code";
+            message.Subject = subject ?? "Your Generated Dashboard Code";
             message.Body = new TextPart("plain")
             {
                 Text = $"Hello,\n\nHere is your generated dashboard code:\n\n{code}\n\nThank you for using DashGen!"
@@ -39,6 +40,26 @@ namespace Services
                 //await client.AuthenticateAsync("dashgen2026@gmail.com", "kpgitvtdeyigdhok");
                 await client.AuthenticateAsync(_fromEmail, _appPassword);
                 await client.SendAsync(message);
+                await client.DisconnectAsync(true);
+            }
+        }
+
+        public async Task SendContactEmailAsync(string name, string fromEmail, string subject, string message)
+        {
+            var emailMessage = new MimeMessage();
+            emailMessage.From.Add(new MailboxAddress(name, fromEmail));
+            emailMessage.To.Add(new MailboxAddress("DashGen Support", _fromEmail));
+            emailMessage.Subject = $"Contact Form: {subject}";
+            emailMessage.Body = new TextPart("plain")
+            {
+                Text = $"Name: {name}\nEmail: {fromEmail}\nSubject: {subject}\n\nMessage:\n{message}"
+            };
+
+            using (var client = new SmtpClient())
+            {
+                await client.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
+                await client.AuthenticateAsync(_fromEmail, _appPassword);
+                await client.SendAsync(emailMessage);
                 await client.DisconnectAsync(true);
             }
         }

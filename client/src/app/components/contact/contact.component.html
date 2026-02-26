@@ -1,0 +1,84 @@
+<div class="contact-container">
+  <div class="contact-header">
+    <div class="contact-header-icon">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M3 8L10.89 13.26C11.2187 13.4793 11.6049 13.5963 12 13.5963C12.3951 13.5963 12.7813 13.4793 13.11 13.26L21 8M5 19H19C19.5304 19 20.0391 18.7893 20.4142 18.4142C20.7893 18.0391 21 17.5304 21 17V7C21 6.46957 20.7893 5.96086 20.4142 5.58579C20.0391 5.21071 19.5304 5 19 5H5C4.46957 5 3.96086 5.21071 3.58579 5.58579C3.21071 5.96086 3 6.46957 3 7V17C3 17.5304 3.21071 18.0391 3.58579 18.4142C3.96086 18.7893 4.46957 19 5 19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h1>Contact Us</h1>
+  </div>
+
+  <div class="contact-card">
+    <h1>Get In Touch</h1>
+    <p class="subtitle">Send us a message and we'll get back to you soon</p>
+
+    <form (ngSubmit)="sendMessage()" class="contact-form">
+      <div class="form-group">
+        <div class="input-wrapper">
+          <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M10 11C12.2091 11 14 9.20914 14 7C14 4.79086 12.2091 3 10 3C7.79086 3 6 4.79086 6 7C6 9.20914 7.79086 11 10 11Z" stroke="currentColor" stroke-width="2"/>
+            <path d="M3 17C3 14.2386 5.68629 12 9 12H11C14.3137 12 17 14.2386 17 17" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          <input 
+            type="text" 
+            [(ngModel)]="contactForm.name" 
+            name="name"
+            placeholder="Name*"
+            required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="input-wrapper">
+          <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M3 4H17C17.55 4 18 4.45 18 5V15C18 15.55 17.55 16 17 16H3C2.45 16 2 15.55 2 15V5C2 4.45 2.45 4 3 4Z" stroke="currentColor" stroke-width="2"/>
+            <path d="M18 5L10 11L2 5" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          <input 
+            type="email" 
+            [(ngModel)]="contactForm.email" 
+            name="email"
+            placeholder="Email*"
+            required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="input-wrapper">
+          <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M3 6H17M3 10H17M3 14H17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <input 
+            type="text" 
+            [(ngModel)]="contactForm.subject" 
+            name="subject"
+            placeholder="Subject*"
+            required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="textarea-wrapper">
+          <svg class="textarea-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M17 11V15C17 15.5304 16.7893 16.0391 16.4142 16.4142C16.0391 16.7893 15.5304 17 15 17H5C4.46957 17 3.96086 16.7893 3.58579 16.4142C3.21071 16.0391 3 15.5304 3 15V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M13 3L17 7L9 15H5V11L13 3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <textarea 
+            [(ngModel)]="contactForm.message" 
+            name="message"
+            placeholder="Message*"
+            rows="6"
+            required></textarea>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-send" [disabled]="loading">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M18 2L9 11M18 2L12 18L9 11M18 2L2 8L9 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span *ngIf="!loading">Send Message</span>
+        <span *ngIf="loading">Sending...</span>
+      </button>
+    </form>
+  </div>
+</div>

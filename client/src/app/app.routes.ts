@@ -9,6 +9,7 @@ import { CartComponent } from './components/cart/cart';
 import { ProductDetailComponent } from './components/product-detail/product-detail';
 import { PaymentComponent } from './components/payment.component';
 import { CodeViewerComponent } from './components/code-viewer.component';
+import { ContactComponent } from './components/contact/contact.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -17,6 +18,7 @@ export const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
   { path: 'payment', component: PaymentComponent },
   { path: 'code-viewer', component: CodeViewerComponent },
+  { path: 'contact', component: ContactComponent },
   { path: 'orders', component: ProjectsComponent },
   { path: 'products', component: ProductsComponent },
   { path: 'product/:id', component: ProductDetailComponent },
